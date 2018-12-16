@@ -1,0 +1,521 @@
+{
+	"variables": [],
+	"info": {
+		"name": "SMPA_REST_test",
+		"_postman_id": "186b164e-a63a-9a29-280c-afbf80d8c6ee",
+		"description": "Testing SMPA rest api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Admin",
+			"description": "Testing SMPA api for an Admin user",
+			"item": [
+				{
+					"name": "admin_authentication",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"Body matches string\"] = responseBody.has(\"x-access-token=\");",
+									"if (responseCode.code === 200 && responseBody.has(\"x-access-token=\")) {",
+									"    // Store the token in the environment",
+									"    postman.setEnvironmentVariable(\"token\", responseBody.split('=')[1]);",
+									"    // As defined in the workflow, set the next request to be executed to admin_rcse",
+									"    postman.setNextRequest(\"admin_rcse\");",
+									"}",
+									"else {",
+									"    // Stop execution",
+									"    postman.setNextRequest(null);",
+									"}",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://localhost:8080/smpa/authentication/user",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\":\"admin@smpa.fr\",\n\t\"password\":\"test\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "admin_rcse",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"x-access-token is present\"] = postman.getResponseHeader(\"x-access-token\");",
+									"tests[\"Body is correct\"] = responseBody === \"This message is just for admins !!\";",
+									"if (responseCode.code === 200 && postman.getResponseHeader(\"x-access-token\")) {",
+									"    // Store the token in the environment",
+									"    postman.setEnvironmentVariable(\"admin_rcse_token\", postman.getResponseHeader(\"x-access-token\"));",
+									"    // As defined in the workflow, set the next request to be executed to admin_rcse",
+									"    postman.setNextRequest(\"user_rcse\");",
+									"}",
+									"else {",
+									"    // Stop execution",
+									"    postman.setNextRequest(null);",
+									"}",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://localhost:8080/smpa/secured/admin",
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "user_rcse",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"x-access-token is present\"] = postman.getResponseHeader(\"x-access-token\");",
+									"tests[\"Body is correct\"] = responseBody === \"This message is just for admins and users !!\";",
+									"if (responseCode.code === 200 && postman.getResponseHeader(\"x-access-token\")) {",
+									"    // Store the token in the environment",
+									"    postman.setEnvironmentVariable(\"user_rcse_token\", postman.getResponseHeader(\"x-access-token\"));",
+									"    // As defined in the workflow, set the next request to be executed to admin_rcse",
+									"    postman.setNextRequest(\"admin_logout\");",
+									"}",
+									"else {",
+									"    // Stop execution",
+									"    postman.setNextRequest(null);",
+									"}",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://localhost:8080/smpa/secured/user",
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{admin_rcse_token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "admin_logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"Body is correct\"] = responseBody === \"done\";",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://localhost:8080/smpa/authentication/logout",
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{user_rcse_token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Student / University",
+			"description": "Testing SMPA api for a Student or University user",
+			"item": [
+				{
+					"name": "user_authentication",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"Body matches string\"] = responseBody.has(\"x-access-token=\");",
+									"if (responseCode.code === 200 && responseBody.has(\"x-access-token=\")) {",
+									"    // Store the token in the environment",
+									"    postman.setEnvironmentVariable(\"token\", responseBody.split('=')[1]);",
+									"    // As defined in the workflow, set the next request to be executed to admin_rcse",
+									"    postman.setNextRequest(\"admin_rcse\");",
+									"}",
+									"else {",
+									"    // Stop execution",
+									"    postman.setNextRequest(null);",
+									"}",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://localhost:8080/smpa/authentication/user",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\":\"user@smpa.fr\",\n\t\"password\":\"root\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "admin_rcse",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 401\"] = responseCode.code === 401;",
+									"tests[\"x-access-token is present\"] = postman.getResponseHeader(\"x-access-token\");",
+									"tests[\"Body is correct\"] = responseBody === \"Not allowed to access this resource!\";",
+									"if (responseCode.code === 401 && postman.getResponseHeader(\"x-access-token\")) {",
+									"    // Store the token in the environment",
+									"    postman.setEnvironmentVariable(\"admin_rcse_token\", postman.getResponseHeader(\"x-access-token\"));",
+									"    // As defined in the workflow, set the next request to be executed to admin_rcse",
+									"    postman.setNextRequest(\"user_rcse\");",
+									"}",
+									"else {",
+									"    // Stop execution",
+									"    postman.setNextRequest(null);",
+									"}",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://localhost:8080/smpa/secured/admin",
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "user_rcse",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"x-access-token is present\"] = postman.getResponseHeader(\"x-access-token\");",
+									"tests[\"Body is correct\"] = responseBody === \"This message is just for admins and users !!\";",
+									"if (responseCode.code === 200 && postman.getResponseHeader(\"x-access-token\")) {",
+									"    // Store the token in the environment",
+									"    postman.setEnvironmentVariable(\"user_rcse_token\", postman.getResponseHeader(\"x-access-token\"));",
+									"    // As defined in the workflow, set the next request to be executed to admin_rcse",
+									"    postman.setNextRequest(\"user_logout\");",
+									"}",
+									"else {",
+									"    // Stop execution",
+									"    postman.setNextRequest(null);",
+									"}",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://localhost:8080/smpa/secured/user",
+						"method": "GET",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{admin_rcse_token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "user_logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"Body is correct\"] = responseBody === \"done\";",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://localhost:8080/smpa/authentication/logout",
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-access-token",
+								"value": "{{user_rcse_token}}",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Other",
+			"description": "Testing SMPA api for users who are not university, admin or student.",
+			"item": [
+				{
+					"name": "admin_rcse",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 401\"] = responseCode.code === 401;",
+									"tests[\"Body is correct\"] = responseBody === \"Not allowed to access this resource!\";"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://localhost:8080/smpa/secured/admin",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "everyone_rces",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"Body is correct\"] = responseBody === \"This message is for everyone !!\";"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://localhost:8080/smpa/secured/everyone",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "user_rcse",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 401\"] = responseCode.code === 401;"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://localhost:8080/smpa/secured/user",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "password_reset_uri",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"Body matches string\"] = responseBody.has(\"http://localhost:8080/smpa/reset/updatePassword/\");",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://localhost:8080/smpa/reset/uri",
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "admin@smpa.fr"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "password_incorrect",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"Body is correct\"] = responseBody === \"incorrect password !!\";"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://localhost:8080/smpa/authentication/user",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\":\"admin@smpa.fr\",\n\t\"password\":\"blabla\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "user_logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 401\"] = responseCode.code === 401;",
+									"tests[\"Body is correct\"] = responseBody === \"Not allowed to access this resource!\";"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://localhost:8080/smpa/authentication/logout",
+						"method": "POST",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "nonexistent_account",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									"tests[\"Status code is 200\"] = responseCode.code === 200;",
+									"tests[\"Body is correct\"] = responseBody === \"No existent account !! \";"
+								]
+							}
+						}
+					],
+					"request": {
+						"url": "http://localhost:8080/smpa/authentication/user",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"email\":\"test@smpa.fr\",\n\t\"password\":\"blabla\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

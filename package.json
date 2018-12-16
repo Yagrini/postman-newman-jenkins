@@ -1,0 +1,13 @@
+{
+  "name": "smpa_rest_api_tests",
+  "version": "1.0.0",
+  "description": "SMPA backend rest api tests",
+  "scripts": {
+    "auth-tests": "newman run Authentication_authorization_tests/SMPA_REST_test.postman_collection"
+  },
+  "author": "Youness Lagrini",
+  "license": "ISC",
+  "dependencies": {
+    "newman": "^4.2.3"
+  }
+}
