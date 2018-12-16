@@ -4,8 +4,8 @@
   "description": "SMPA backend rest api tests",
   "scripts": {
     "admin_auth-tests": "newman run Authentication_authorization_tests/SMPA_REST_test.postman_collection --folder 'Admin'",
-    "user_auth-tests": "newman run SMPA_REST_test.postman_collection --folder 'Student / University'",
-    "other_auth-tests": "newman run SMPA_REST_test.postman_collection --folder 'Other'"
+    "user_auth-tests": "newman run Authentication_authorization_tests/SMPA_REST_test.postman_collection --folder 'Student / University'",
+    "other_auth-tests": "newman run Authentication_authorization_tests/SMPA_REST_test.postman_collection --folder 'Other'"
   },
   "author": "Youness Lagrini",
   "license": "ISC",
